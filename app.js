@@ -20,7 +20,8 @@ server.post('/api/messages', (req, res) => {
     // Route received request to adapter for processing
     adapter.processActivity(req, res, async (context) => {
         if (context.activity.type === 'message') {
-            await context.sendActivity(context.activity.text);
+            const message = processMessage(context.activity.text, context.activity.channelId);
+            await context.sendActivity(message);
         } else if (context.activity.type === 'conversationUpdate') {
             if (context.activity.membersAdded &&
                 context.activity.membersAdded[0].id.includes(process.env.MICROSOFT_APP_ID)) {
@@ -29,3 +30,12 @@ server.post('/api/messages', (req, res) => {
         }
     });
 });
+
+const processMessage = (message, channel) => {
+    if (channel === "msteams") {
+        //+9 for the <at></at> tags
+        message = message.slice(process.env.BOT_NAME.length+9, message.length);
+    }
+
+    return message.trim().toLowerCase();
+}
