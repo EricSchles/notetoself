@@ -1,0 +1,28 @@
+{
+  "name": "notetoself",
+  "version": "0.1.0",
+  "description": "a chatbot that keeps and categorizes the notes and links you send to yourself",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lbochenek/notetoself.git"
+  },
+  "keywords": [
+    "bot",
+    "framework"
+  ],
+  "author": "Laura Bochenek",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lbochenek/notetoself/issues"
+  },
+  "homepage": "https://github.com/lbochenek/notetoself#readme",
+  "dependencies": {
+    "botbuilder": "^4.0.0-m4.1",
+    "restify": "^7.1.1"
+  }
+}
