@@ -23,6 +23,7 @@
   "homepage": "https://github.com/lbochenek/notetoself#readme",
   "dependencies": {
     "botbuilder": "^4.0.0-m4.1",
+    "dotenv": "^5.0.1",
     "restify": "^7.1.1"
   }
 }

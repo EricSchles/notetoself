@@ -18,4 +18,4 @@ Deployed to Azure Functions App
 
 #### [Bot Channels](https://docs.microsoft.com/en-us/azure/bot-service/bot-service-quickstart-registration)
 
-If have bot hosted elsewhere and want to use Bot Service to connect the bot to other channels
+If have bot hosted elsewhere and want to use Bot Service to connect the bot to other channels (i.e. no App service provisioned on creation of bot)
