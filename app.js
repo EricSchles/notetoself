@@ -1,8 +1,7 @@
 const botbuilder = require('botbuilder');
 const restify = require('restify');
 require('dotenv').config();
-const DBHelper = require('./helpers/database');
-const dbhelper = new DBHelper();
+const DBHandler = require('./middleware/DbHandler');
 
 // Create server
 let server = restify.createServer();
@@ -20,16 +19,20 @@ const adapter = new botbuilder.BotFrameworkAdapter({
 const conversationState = new botbuilder.ConversationState(new botbuilder.MemoryStorage()); 
 adapter.use(conversationState);
 
+const dbHandler = new DBHandler(conversationState);
+adapter.use(dbHandler);
+
 // Listen for incoming requests 
 server.post('/api/messages', (req, res) => {
     // Route received request to adapter for processing
     adapter.processActivity(req, res, async (context) => {
         if (context.activity.type === 'message') {
             const message = processMessage(context.activity.text, context.activity.channelId, context.activity.conversation.conversationType);
-            const state = conversationState.get(context);
-            if (!state.prompt) {
+            const convoState = conversationState.get(context);
+            if (!convoState.prompt) {
                 if (message === 'save') {
-                    state.prompt = 'type';
+                    convoState.prompt = 'type';
+                    convoState.newContent = {};
                     const saveContentMessageCard = botbuilder.MessageFactory.attachment(botbuilder.CardFactory.heroCard('What type of content do you want to save?', null, [
                         {
                             "type": "imBack",
@@ -61,20 +64,20 @@ server.post('/api/messages', (req, res) => {
                     await context.sendActivity(message);
                 }
             } else {
-                switch(state.prompt) {
+                switch(convoState.prompt) {
                     case 'type':
-                        //TODO manage content
-                        state.prompt = 'content';
+                        convoState.prompt = 'content';
+                        convoState.newContent.contentType = message;
                         await context.sendActivity('Great! Now please send me the content you want to save');
                         break;
                     case 'content':
-                        //TODO manage content
-                        state.prompt = 'tags';
+                        convoState.prompt = 'tags';
+                        convoState.newContent.content = message;
                         await context.sendActivity('Thank you! What do you want to tag this as? Please enter a comma-deliminated list');
                         break;
                     case 'tags':
-                        //TODO manage content
-                        state.prompt = undefined;
+                        convoState.prompt = undefined;
+                        convoState.newContent.tags = processTags(message);
                         await context.sendActivity('Alright~ I\'ll save it forever and ever~');
                         //TODO: add undo
                         break;
@@ -101,4 +104,10 @@ const processMessage = (message, channel, convoType) => {
     }
 
     return message.trim().toLowerCase();
+}
+
+const processTags = (tags) => {
+    const tagsAry = tags.split(",");
+    const finalTags = tagsAry.map(tag => tag.trim().toLowerCase());
+    return finalTags;
 }
