@@ -26,8 +26,13 @@ class DBHandler {
         //after turn
         const currentConvoStateAfter = this.conversationState.get(context);
         if (previousPromptState === 'tags' && currentConvoStateAfter.prompt === undefined) { //user finished putting in content
-            this.contentDao.addContent(currentConvoStateAfter.newContent);
-            currentConvoStateAfter.newContent = undefined;
+            const potentialSave = this.contentDao.addContent(currentConvoStateAfter.newContent);
+            if (potentialSave && potentialSave.message === "PREVIOUSLY_SAVED") {
+                await context.sendActivity(`You already saved this content on ${potentialSave.date.toLocaleDateString()} ${potentialSave.date.toLocaleTimeString()}`);
+            } else {
+                await context.sendActivity('Alright~ I\'ll save it forever and ever~');
+                currentConvoStateAfter.newContent = undefined;
+            }
         }
 
         

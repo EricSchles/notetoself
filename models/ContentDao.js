@@ -36,7 +36,13 @@ class ContentDao {
             excludeKeys: (key) => key === 'tags'
         });
         if (this.user.content[contentHash]) {
-            //TODO: what if there is a hash conflict???
+            let dateSaved = new Date(this.user.content[contentHash].date);
+            return {
+                message: "PREVIOUSLY_SAVED",
+                date: dateSaved,
+                contentObj: this.user.content[contentHash]
+            };
+            //TODO: more complex collision handling
         } else {
             this.user.content[contentHash] = {
                 id: contentHash,

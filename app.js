@@ -78,7 +78,6 @@ server.post('/api/messages', (req, res) => {
                     case 'tags':
                         convoState.prompt = undefined;
                         convoState.newContent.tags = processTags(message);
-                        await context.sendActivity('Alright~ I\'ll save it forever and ever~');
                         //TODO: add undo
                         break;
                     default:
