@@ -41,6 +41,7 @@ class ContentDao {
             this.user.content[contentHash] = {
                 id: contentHash,
                 type: "content",
+                date: Date.now(),
                 ...content
             };
             content.tags.forEach(tag => {

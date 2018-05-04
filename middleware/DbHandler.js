@@ -17,7 +17,6 @@ class DBHandler {
             }
         }
 
-        //before turn
         const currentConvoStateBefore = this.conversationState.get(context);
         const previousPromptState = currentConvoStateBefore.prompt;
 
