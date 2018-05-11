@@ -1,4 +1,5 @@
 const botbuilder = require('botbuilder');
+const HelpDialog = require('./HelpDialog');
 const Dialog = require('./Dialog');
 
 class SaveContentDialog extends Dialog {
@@ -6,12 +7,22 @@ class SaveContentDialog extends Dialog {
         super(convoState, userState, name);
 
         this.endDialog = endDialogCallback;
+        this.endDialogForChild = this.onDialogEnd.bind(this);
+
+        this.helpDialog = new HelpDialog(convoState, userState, 'List of available commands:<br>`help`: will send a list of available commands in your current dialog<br>`cancel`: will cancel saving the connect you\'re currently trying to save<br>Or simply follow the prompt I sent above', this.endDialogForChild);
     }
 
     async onTurn(context, message) {
-        super.onTurn(context, message, async (context, message) => {
+        super.onTurn(context, message, this.helpDialog, async (context, message) => {
             const currentConvoState = this.convoState? this.convoState.get(context) : null;
             const currentUserState = this.userState? this.userState.get(context) : null;
+
+            if (message === 'cancel') {
+                this.endDialog(context, this.name);
+                currentConvoState.prompt = undefined;
+                currentConvoState.newContent = undefined;
+                return await context.sendActivity("Content save canceled. Let me know later if you want to save something else!");
+            }
 
             if (!currentConvoState.prompt) {
                 currentConvoState.prompt = 'type';
@@ -56,7 +67,7 @@ class SaveContentDialog extends Dialog {
                     case 'tags':
                         currentConvoState.prompt = undefined;
                         currentConvoState.newContent.tags = this.processTags(message);
-                        this.endDialog(context);
+                        this.endDialog(context, this.name);
                         //TODO: add undo
                         return;
                     default:

@@ -7,11 +7,16 @@ class Dialog {
         this.currentLocation = name;
     }
 
-    async onTurn(context, message, onActualTurn) {
+    async onTurn(context, message, helpDialog, onActualTurn) {
         if (this.currentLocation !== this.name) {
             return await this.currentLocation.onTurn(context, message);
         } else {
-            return await onActualTurn(context, message);
+            if (!helpDialog || this.currentLocation === 'help' || message !== 'help') {
+                return await onActualTurn(context, message);
+            } else {
+                this.newChild(helpDialog);
+                return await this.currentLocation.onTurn(context, message);
+            }
         }
     }
 

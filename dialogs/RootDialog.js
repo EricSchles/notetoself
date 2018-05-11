@@ -1,4 +1,5 @@
 const Dialog = require('./Dialog');
+const HelpDialog = require('./HelpDialog');
 const SaveContentDialog = require('./SaveContentDialog');
 
 class RootDialog extends Dialog {
@@ -6,11 +7,17 @@ class RootDialog extends Dialog {
         super(convoState, userState, name);
 
         this.onDialogEnd = this.onDialogEnd.bind(this);
+
+        this.helpDialog = new HelpDialog(
+            convoState,
+            userState,
+            'Hi! I\'m NoteToSelf! I\'m here to keep stuff you have to save for later. I\'ll keep your content safe and organize it so you can easily access it later<br><br>List of available commands:<br>`help`: will send a list of available commands in your current dialog<br>`save`: will allow you to save some text, a link, or some code you want to save for later',
+            this.onDialogEnd);
     }
 
     async onTurn(context) {
         const message = this.processMessage(context.activity.text, context.activity.channelId, context.activity.conversation.conversationType);
-        super.onTurn(context, message, async (context, message) => {
+        super.onTurn(context, message, this.helpDialog, async (context, message) => {
             const currentConvoState = this.convoState? this.convoState.get(context) : null;
             const currentUserState = this.userState? this.userState.get(context) : null;
 
